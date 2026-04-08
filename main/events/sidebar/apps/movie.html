@@ -4,54 +4,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming Soon</title>
+  <title>Ghost | Movies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --bg: #000000;
+      --surf: #1c1c1e;
+      --s2: #2c2c2e;
+      --s3: #3a3a3c;
+      --border: #38383a;
+      --ink: #ffffff;
+      --ink2: #b0b0b0;
+      --ink3: #6e6e73;
+      --pink: #fc3c6c;
+      --pink2: #e8355f;
+      --glow: rgba(252,60,108,.15);
+      --red: #ff453a;
+      --orange: #ff9f0a;
+      --r: 14px;
+      --rl: 20px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;background:var(--bg)}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+
+    .app{display:flex;height:100vh;padding:16px;gap:16px;overflow:hidden}
+
+    .left{
+      display:flex;flex-direction:column;gap:16px;
+      width:340px;flex-shrink:0;
+    }
+    .categories{
+      background:var(--surf);border-radius:var(--rl);
+      padding:20px;
+    }
+    .categories h2{
+      font-size:18px;font-weight:600;margin-bottom:16px;
+    }
+    .category-list{
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .category-btn{
+      background:none;border:none;color:var(--ink2);
+      text-align:left;padding:8px 12px;border-radius:8px;
+      cursor:pointer;transition:background .2s;
+    }
+    .category-btn:hover,.category-btn.active{
+      background:var(--s2);color:var(--ink);
     }
 
-    body {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f5f5f5;
-      font-family: "Georgia", serif;
-      color: #222;
+    .right{
+      flex:1;min-height:0;display:flex;flex-direction:column;gap:16px;
+    }
+    .search-bar{
+      background:var(--surf);border-radius:var(--rl);
+      padding:16px;display:flex;gap:12px;align-items:center;
+    }
+    .search-input{
+      flex:1;background:var(--s2);border:none;border-radius:8px;
+      padding:8px 12px;color:var(--ink);font-size:14px;
+    }
+    .search-input::placeholder{color:var(--ink3)}
+    .search-btn{
+      background:var(--pink);border:none;border-radius:8px;
+      padding:8px 16px;color:white;font-size:14px;cursor:pointer;
     }
 
-    .content {
-      text-align: center;
+    .movie-grid{
+      flex:1;min-height:0;background:var(--surf);border-radius:var(--rl);
+      padding:20px;overflow-y:auto;
+    }
+    .movie-list{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;
+    }
+    .movie-item{
+      background:var(--s2);border-radius:12px;overflow:hidden;
+      cursor:pointer;transition:transform .2s;
+    }
+    .movie-item:hover{transform:translateY(-2px)}
+    .movie-poster{
+      width:100%;height:120px;background:var(--s3);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--ink3);font-size:12px;
+    }
+    .movie-info{
+      padding:12px;
+    }
+    .movie-title{
+      font-size:14px;font-weight:500;margin-bottom:4px;
+    }
+    .movie-year{
+      font-size:12px;color:var(--ink3);
     }
 
-    h1 {
-      font-size: 2.5rem;
-      font-weight: normal;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
+    .player-modal{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.9);display:none;align-items:center;
+      justify-content:center;z-index:1000;
     }
-
-    p {
-      color: #555;
-      font-size: 1rem;
+    .player-content{
+      width:90%;max-width:800px;background:var(--surf);
+      border-radius:var(--rl);padding:20px;
+    }
+    .player-header{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:16px;
+    }
+    .player-title{font-size:18px;font-weight:600}
+    .close-btn{
+      background:none;border:none;color:var(--ink);
+      font-size:24px;cursor:pointer;
+    }
+    .video-player{
+      width:100%;height:450px;background:black;border-radius:8px;
     }
   </style>
 </head>
 <body>
-  <div class="content">
-    <h1>Coming Soon</h1>
-    <p>We’re working on something new.</p>
-    <p>(As in me :/ - Leah)</p>
+  <div class="app">
+    <div class="left">
+      <div class="categories">
+        <h2>Categories</h2>
+        <div class="category-list">
+          <button class="category-btn active" data-category="all">All Movies</button>
+          <button class="category-btn" data-category="action">Action</button>
+          <button class="category-btn" data-category="comedy">Comedy</button>
+          <button class="category-btn" data-category="drama">Drama</button>
+          <button class="category-btn" data-category="horror">Horror</button>
+          <button class="category-btn" data-category="sci-fi">Sci-Fi</button>
+          <button class="category-btn" data-category="documentary">Documentary</button>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Search movies..." id="searchInput">
+        <button class="search-btn" id="searchBtn">Search</button>
+      </div>
+      <div class="movie-grid">
+        <div class="movie-list" id="movieList">
+          <!-- Movies will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="player-modal" id="playerModal">
+    <div class="player-content">
+      <div class="player-header">
+        <div class="player-title" id="playerTitle"></div>
+        <button class="close-btn" id="closeBtn">&times;</button>
+      </div>
+      <div class="video-player" id="videoPlayer">
+        <!-- Video iframe will be inserted here -->
+      </div>
+    </div>
   </div>
 
   <script>
-    document.body.style.opacity = 0;
-    window.onload = () => {
-      document.body.style.transition = "opacity 1s ease";
-      document.body.style.opacity = 1;
-    };
+    const movies = [
+      { id: 1, title: "The Great Train Robbery", year: 1903, category: "action", url: "https://archive.org/embed/TheGreatTrainRobbery" },
+      { id: 2, title: "A Trip to the Moon", year: 1902, category: "sci-fi", url: "https://archive.org/embed/trip_to_the_moon_1902" },
+      { id: 3, title: "The Birth of a Nation", year: 1915, category: "drama", url: "https://archive.org/embed/birthofanation1915" },
+      { id: 4, title: "Nosferatu", year: 1922, category: "horror", url: "https://archive.org/embed/Nosferatu1922" },
+      { id: 5, title: "Metropolis", year: 1927, category: "sci-fi", url: "https://archive.org/embed/Metropolis1927" },
+      { id: 6, title: "The General", year: 1926, category: "comedy", url: "https://archive.org/embed/thegeneral1926" },
+      { id: 7, title: "Sunrise", year: 1927, category: "drama", url: "https://archive.org/embed/Sunrise1927" },
+      { id: 8, title: "Steamboat Willie", year: 1928, category: "comedy", url: "https://archive.org/embed/SteamboatWillie" },
+      { id: 9, title: "All Quiet on the Western Front", year: 1930, category: "drama", url: "https://archive.org/embed/AllQuietOnTheWesternFront1930" },
+      { id: 10, title: "King Kong", year: 1933, category: "action", url: "https://archive.org/embed/KingKong1933" },
+      { id: 11, title: "The Wizard of Oz", year: 1939, category: "drama", url: "https://archive.org/embed/TheWizardOfOz1939" },
+      { id: 12, title: "Citizen Kane", year: 1941, category: "drama", url: "https://archive.org/embed/CitizenKane1941" },
+      { id: 13, title: "Casablanca", year: 1942, category: "drama", url: "https://archive.org/embed/Casablanca1942" },
+      { id: 14, title: "It's a Wonderful Life", year: 1946, category: "drama", url: "https://archive.org/embed/ItsAWonderfulLife1946" },
+      { id: 15, title: "The Day the Earth Stood Still", year: 1951, category: "sci-fi", url: "https://archive.org/embed/TheDayTheEarthStoodStill1951" },
+      { id: 16, title: "Rear Window", year: 1954, category: "horror", url: "https://archive.org/embed/RearWindow1954" },
+      { id: 17, title: "The Night of the Hunter", year: 1955, category: "horror", url: "https://archive.org/embed/TheNightOfTheHunter1955" },
+      { id: 18, title: "The Bridge on the River Kwai", year: 1957, category: "drama", url: "https://archive.org/embed/TheBridgeOnTheRiverKwai1957" },
+      { id: 19, title: "Vertigo", year: 1958, category: "horror", url: "https://archive.org/embed/Vertigo1958" },
+      { id: 20, title: "Psycho", year: 1960, category: "horror", url: "https://archive.org/embed/Psycho1960" },
+      { id: 21, title: "Lawrence of Arabia", year: 1962, category: "drama", url: "https://archive.org/embed/LawrenceOfArabia1962" },
+      { id: 22, title: "Dr. Strangelove", year: 1964, category: "comedy", url: "https://archive.org/embed/DrStrangelove1964" },
+      { id: 23, title: "The Sound of Music", year: 1965, category: "drama", url: "https://archive.org/embed/TheSoundOfMusic1965" },
+      { id: 24, title: "2001: A Space Odyssey", year: 1968, category: "sci-fi", url: "https://archive.org/embed/2001ASpaceOdyssey1968" },
+      { id: 25, title: "The Godfather", year: 1972, category: "drama", url: "https://archive.org/embed/TheGodfather1972" },
+      { id: 26, title: "Jaws", year: 1975, category: "horror", url: "https://archive.org/embed/Jaws1975" },
+      { id: 27, title: "Star Wars", year: 1977, category: "sci-fi", url: "https://archive.org/embed/StarWars1977" },
+      { id: 28, title: "Apocalypse Now", year: 1979, category: "drama", url: "https://archive.org/embed/ApocalypseNow1979" },
+      { id: 29, title: "The Empire Strikes Back", year: 1980, category: "sci-fi", url: "https://archive.org/embed/TheEmpireStrikesBack1980" },
+      { id: 30, title: "Raiders of the Lost Ark", year: 1981, category: "action", url: "https://archive.org/embed/RaidersOfTheLostArk1981" },
+      { id: 31, title: "E.T. the Extra-Terrestrial", year: 1982, category: "sci-fi", url: "https://archive.org/embed/ETTheExtraTerrestrial1982" },
+      { id: 32, title: "Return of the Jedi", year: 1983, category: "sci-fi", url: "https://archive.org/embed/ReturnOfTheJedi1983" },
+      { id: 33, title: "Back to the Future", year: 1985, category: "sci-fi", url: "https://archive.org/embed/BackToTheFuture1985" },
+      { id: 34, title: "The Princess Bride", year: 1987, category: "comedy", url: "https://archive.org/embed/ThePrincessBride1987" },
+      { id: 35, title: "Who Framed Roger Rabbit", year: 1988, category: "comedy", url: "https://archive.org/embed/WhoFramedRogerRabbit1988" },
+      { id: 36, title: "The Silence of the Lambs", year: 1991, category: "horror", url: "https://archive.org/embed/TheSilenceOfTheLambs1991" },
+      { id: 37, title: "Jurassic Park", year: 1993, category: "action", url: "https://archive.org/embed/JurassicPark1993" },
+      { id: 38, title: "Pulp Fiction", year: 1994, category: "drama", url: "https://archive.org/embed/PulpFiction1994" },
+      { id: 39, title: "Forrest Gump", year: 1994, category: "drama", url: "https://archive.org/embed/ForrestGump1994" },
+      { id: 40, title: "The Shawshank Redemption", year: 1994, category: "drama", url: "https://archive.org/embed/TheShawshankRedemption1994" },
+      { id: 41, title: "Toy Story", year: 1995, category: "comedy", url: "https://archive.org/embed/ToyStory1995" },
+      { id: 42, title: "Independence Day", year: 1996, category: "sci-fi", url: "https://archive.org/embed/IndependenceDay1996" },
+      { id: 43, title: "Titanic", year: 1997, category: "drama", url: "https://archive.org/embed/Titanic1997" },
+      { id: 44, title: "The Matrix", year: 1999, category: "sci-fi", url: "https://archive.org/embed/TheMatrix1999" },
+      { id: 45, title: "Fight Club", year: 1999, category: "drama", url: "https://archive.org/embed/FightClub1999" },
+      { id: 46, title: "Gladiator", year: 2000, category: "action", url: "https://archive.org/embed/Gladiator2000" },
+      { id: 47, title: "The Lord of the Rings: The Fellowship of the Ring", year: 2001, category: "action", url: "https://archive.org/embed/TheLordOfTheRingsTheFellowshipOfTheRing2001" },
+      { id: 48, title: "Spider-Man", year: 2002, category: "action", url: "https://archive.org/embed/SpiderMan2002" },
+      { id: 49, title: "The Lord of the Rings: The Two Towers", year: 2002, category: "action", url: "https://archive.org/embed/TheLordOfTheRingsTheTwoTowers2002" },
+      { id: 50, title: "The Lord of the Rings: The Return of the King", year: 2003, category: "action", url: "https://archive.org/embed/TheLordOfTheRingsTheReturnOfTheKing2003" },
+      { id: 51, title: "Home Alone", year: 1989, category: "christmas", url: "https://drive.google.com/file/d/18YKNCTokG3B7ZWzCE3thunyDJMktLxnm/view" }
+    ];
+
+    let currentCategory = 'all';
+    let filteredMovies = movies;
+
+    function renderMovies() {
+      const movieList = document.getElementById('movieList');
+      movieList.innerHTML = '';
+      
+      filteredMovies.forEach(movie => {
+        const movieItem = document.createElement('div');
+        movieItem.className = 'movie-item';
+        movieItem.onclick = () => playMovie(movie);
+        
+        movieItem.innerHTML = `
+          <div class="movie-poster">🎬</div>
+          <div class="movie-info">
+            <div class="movie-title">${movie.title}</div>
+            <div class="movie-year">${movie.year}</div>
+          </div>
+        `;
+        
+        movieList.appendChild(movieItem);
+      });
+    }
+
+    function filterMovies(category) {
+      currentCategory = category;
+      if (category === 'all') {
+        filteredMovies = movies;
+      } else {
+        filteredMovies = movies.filter(movie => movie.category === category);
+      }
+      renderMovies();
+    }
+
+    function searchMovies(query) {
+      filteredMovies = movies.filter(movie => 
+        movie.title.toLowerCase().includes(query.toLowerCase()) ||
+        movie.year.toString().includes(query)
+      );
+      renderMovies();
+    }
+
+    function playMovie(movie) {
+      const modal = document.getElementById('playerModal');
+      const title = document.getElementById('playerTitle');
+      const player = document.getElementById('videoPlayer');
+      
+      title.textContent = `${movie.title} (${movie.year})`;
+      player.innerHTML = `<iframe src="${movie.url}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
+      
+      modal.style.display = 'flex';
+    }
+
+    function closePlayer() {
+      const modal = document.getElementById('playerModal');
+      const player = document.getElementById('videoPlayer');
+      
+      modal.style.display = 'none';
+      player.innerHTML = '';
+    }
+
+    // Event listeners
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterMovies(btn.dataset.category);
+      });
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const query = document.getElementById('searchInput').value;
+      searchMovies(query);
+    });
+
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = document.getElementById('searchInput').value;
+        searchMovies(query);
+      }
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', closePlayer);
+    document.getElementById('playerModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('playerModal')) {
+        closePlayer();
+      }
+    });
+
+    // Initial render
+    renderMovies();
   </script>
 </body>
 </html>
